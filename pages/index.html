@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .table-container {
+            margin-top: 20px;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-3">
+        <h1 class="fs-5 text-start">Manage Inventory Items</h1>
+
+        <div class="row align-items-center">
+         
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="inputSearchFor" class="col-form-label">Search For</label>
+                    <input
+                        type="text"
+                        id="inputSearchFor"
+                        class="form-control"
+                        aria-describedby="SearchForInline"
+                    />
+                </div>
+            </div>
+
+         
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label for="selectStatus" class="col-form-label">Status</label>
+                    <select
+                        class="form-control"
+                        id="selectStatus"
+                    >
+                        <option selected>Status...</option>
+                        <option value="1">In Stock</option>
+                        <option value="2">Out of Stock</option>
+                        <option value="3">Discontinued</option>
+                    </select>
+                </div>
+            </div>
+
+    
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label for="selectSortBy" class="col-form-label">Sort By</label>
+                    <select
+                        class="form-control"
+                        id="selectSortBy"
+                    >
+                        <option selected>Name...</option>
+                        <option value="1">One</option>
+                        <option value="2">Two</option>
+                        <option value="3">Three</option>
+                    </select>
+                </div>
+            </div>
+
+     
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label for="selectCategory" class="col-form-label">Category</label>
+                    <select
+                        class="form-control"
+                        id="selectCategory"
+                    >
+                        <option selected>Choose Category...</option>
+                        <option value="1">Category 1</option>
+                        <option value="2">Category 2</option>
+                        <option value="3">Category 3</option>
+                    </select>
+                </div>
+            </div>
+
+          
+            <div class="col-md-2">
+                <button type="button" class="btn btn-outline-info btn-block">Search</button>
+            </div>
+        </div>
+
+      
+        <button
+            type="button"
+            class="btn btn-primary btn-sm fw-semibold mt-3"
+            data-toggle="modal"
+            data-target="#addInventoryModal"
+        >
+            Add Inventory Item
+        </button>
+
+      
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">id#</th>
+                        <th scope="col">number</th>
+                        <th scope="col">Model</th>
+                        <th scope="col">category</th>
+                        <th scope="col">serial #</th>
+                        <th scope="col">actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for i in item_list %}
+                    <tr>
+                        <th scope="row">{{ i.id }}</th>  
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ i.model }}</td>
+                        <td>{{ i.itemType }}</td>
+                        <td>{{ i.serialNumber }}</td>
+                        <td>
+                            <!-- <a href="#" class="btn btn-info btn-sm">Edit</a> -->
+                            <button type="button" class="btn btn-info btn-sm btn-edit-item"
+                            data-toggle="modal"
+                            data-target="#editModal">
+                            Edit
+                           </button>
+
+                            <a href="{% url 'delete_item' i.id %}" class="btn btn-danger btn-sm">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                
+                
+            </table>
+        </div>
+    </div>
+
+
+
+    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">EDIT ITEM</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post"action="#">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="editSelectItemType">Select Item Type:</label>
+                            <select class="form-control" id="editSelectItemType" name="itemType">
+                                <option selected>Item Type</option>
+                                <option value="Laptop">Laptop</option>
+                                <option value="Smartphone">Smartphone</option>
+                                <option value="Tablet">Tablet</option>
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="editBrandName">Brand Name:</label>
+                                <input type="text" class="form-control" id="editBrandName" name="brandName">
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label for="editModel">Model:</label>
+                                <input type="text" class="form-control" id="editModel" name="model">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editQuantity">Quantity:</label>
+                            <input type="number" class="form-control" id="editQuantity" name="quantity">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editSerialNumber">Serial Number:</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="editSerialNumber" name="serialNumber" readonly>
+                                <div class="input-group-append">
+                                    <button type="button" class="btn btn-secondary" id="editGenerateSerialNumber">Generate</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editDescription">Description:</label>
+                            <textarea class="form-control" id="editDescription" name="description" rows="3"></textarea>
+                        </div>
+
+                         
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div> 
+
+
+
+
+
+
+    
+  
+    <div class="modal fade" id="addInventoryModal" tabindex="-1" role="dialog" aria-labelledby="addInventoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addInventoryModalLabel">Add Inventory Item</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" action="{% url 'create_item' %}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="selectItemType">Select Item Type:</label>
+                            <select class="form-control" id="selectItemType" name="itemType">
+                                <option selected>Item Type</option>
+                                <option value="Laptop">Laptop</option>
+                                <option value="Smartphone">Smartphone</option>
+                                <option value="Tablet">Tablet</option>
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="itemName">Brand Name:</label>
+                                <input type="text" class="form-control" id="itemName" name="brandName">
+                            </div>
+
+                            <div class="form-group col-md-6">
+                                <label for="model">Model:</label>
+                                <input type="text" class="form-control" id="model" name="model">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="quantity">Quantity:</label>
+                            <input type="number" class="form-control" id="quantity" name="quantity">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="serialNumber">Serial Number:</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="serialNumber" name="serialNumber" readonly>
+                                <div class="input-group-append">
+                                    <button type="button" class="btn btn-secondary" id="generateSerialNumber">Generate</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description">Description:</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        </div>
+
+                       
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+
+    <script>
+        document.getElementById('addItemForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+ 
+            const itemId = Math.floor(Math.random() * 900000000 + 100000000);
+
+            const serialNumber = Math.floor(Math.random() * 900000000 + 100000000);
+           
+            document.getElementById('itemId').value = itemId;
+            document.getElementById('serialNumber').value = serialNumber;
+    
+    
+        });
+    </script>
+
+    <script>
+        document.getElementById('generateSerialNumber').addEventListener('click', function () {
+  
+            const serialNumber = Math.floor(Math.random() * 900000000 + 100000000);
+
+            document.getElementById('serialNumber').value = serialNumber;
+        });
+    </script>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
